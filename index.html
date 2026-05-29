@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PostPulse — AI Social Analyzer</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="pp-wrap">
+    <div class="pp-header">
+      <div class="pp-header-top">
+        <span class="pp-badge">PostPulse v2</span>
+        <span class="pp-live">Live Engine</span>
+      </div>
+      <div class="pp-title">Social Intelligence Engine</div>
+      <div class="pp-subtitle">Predict likes · Compare platforms · Analyze performance windows</div>
+    </div>
+
+    <div class="pp-body">
+      <div class="pp-grid">
+        <div class="pp-field">
+          <label>Post Hour (0–23)</label>
+          <input type="number" id="postHour" min="0" max="23" value="12" placeholder="e.g. 14">
+        </div>
+        <div class="pp-field">
+          <label>Content Type</label>
+          <select id="contentType">
+            <option value="photo">Photo</option>
+            <option value="reel">Reel / Short Video</option>
+            <option value="carousel">Carousel</option>
+            <option value="story">Story</option>
+            <option value="text">Text Post</option>
+          </select>
+        </div>
+      </div>
+      <div class="pp-field">
+        <label>Upload Image</label>
+        <div class="pp-upload" id="uploadBox">
+          <input type="file" id="imgInput" accept="image/*">
+          <div class="pp-upload-icon">📸</div>
+          <div class="pp-upload-text">Click or drag to upload JPG, PNG, WEBP</div>
+          <div class="pp-upload-name" id="uploadName"></div>
+          <img class="pp-preview" id="imgPreview" alt="Preview">
+        </div>
+      </div>
+      <button class="pp-btn" id="runBtn">Run Analysis →</button>
+
+      <div id="resultsArea" class="pp-results-hidden">
+        <div class="pp-section-label">Engagement Forecast</div>
+        <div class="pp-metrics">
+          <div class="pp-metric">
+            <div class="pp-metric-val" id="mLikes" style="color:#7c6fff">—</div>
+            <div class="pp-metric-lbl">Predicted Likes</div>
+          </div>
+          <div class="pp-metric">
+            <div class="pp-metric-val" id="mComments" style="color:#ff6b9d">—</div>
+            <div class="pp-metric-lbl">Est. Comments</div>
+          </div>
+          <div class="pp-metric">
+            <div class="pp-metric-val" id="mShares" style="color:#4fffb0">—</div>
+            <div class="pp-metric-lbl">Est. Shares</div>
+          </div>
+          <div class="pp-metric">
+            <div class="pp-metric-val" id="mReach" style="color:#ffd166">—</div>
+            <div class="pp-metric-lbl">Reach (K)</div>
+          </div>
+        </div>
+
+        <div class="pp-section-label">Platform Breakdown</div>
+        <div class="pp-platform-row">
+          <div class="pp-platform" id="platIG">
+            <div class="pp-platform-icon">📷</div>
+            <div class="pp-platform-name">Instagram</div>
+            <div class="pp-platform-likes" id="igLikes">—</div>
+            <div class="pp-platform-trend" id="igTrend"></div>
+          </div>
+          <div class="pp-platform" id="platYT">
+            <div class="pp-platform-icon">▶️</div>
+            <div class="pp-platform-name">YouTube</div>
+            <div class="pp-platform-likes" id="ytLikes">—</div>
+            <div class="pp-platform-trend" id="ytTrend"></div>
+          </div>
+          <div class="pp-platform" id="platTW">
+            <div class="pp-platform-icon">𝕏</div>
+            <div class="pp-platform-name">Twitter/X</div>
+            <div class="pp-platform-likes" id="twLikes">—</div>
+            <div class="pp-platform-trend" id="twTrend"></div>
+          </div>
+          <div class="pp-platform" id="platTK">
+            <div class="pp-platform-icon">🎵</div>
+            <div class="pp-platform-name">TikTok</div>
+            <div class="pp-platform-likes" id="tkLikes">—</div>
+            <div class="pp-platform-trend" id="tkTrend"></div>
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:1.25rem">
+          <span class="pp-section-label" style="margin:0">24-Hour Performance Graph</span>
+          <span class="pp-real-badge">Real-time model</span>
+        </div>
+        <div class="pp-chart-wrap">
+          <canvas id="mainChart" role="img" aria-label="24-hour predicted likes graph">24-hour predicted engagement across all posting hours.</canvas>
+        </div>
+
+        <div class="pp-section-label">Hourly Heatmap — Best Windows</div>
+        <div id="heatmapBars"></div>
+
+        <div class="pp-section-label">Image Intelligence</div>
+        <div class="pp-detail-grid">
+          <div class="pp-detail-card">
+            <div class="pp-detail-title">Brightness Score</div>
+            <div class="pp-detail-val" id="dBright">—</div>
+            <div class="pp-detail-sub" id="dBrightSub">—</div>
+          </div>
+          <div class="pp-detail-card">
+            <div class="pp-detail-title">Colour Vibrancy</div>
+            <div class="pp-detail-val" id="dSat">—</div>
+            <div class="pp-detail-sub" id="dSatSub">—</div>
+          </div>
+          <div class="pp-detail-card">
+            <div class="pp-detail-title">Best Platform</div>
+            <div class="pp-detail-val" id="dPlat" style="font-size:13px">—</div>
+            <div class="pp-detail-sub" id="dPlatSub">—</div>
+          </div>
+          <div class="pp-detail-card">
+            <div class="pp-detail-title">Engagement Score</div>
+            <div class="pp-detail-val" id="dEngScore" style="color:#7c6fff">—</div>
+            <div class="pp-detail-sub" id="dEngSub">out of 100</div>
+          </div>
+        </div>
+
+        <div class="pp-section-label">Suggested Hashtags</div>
+        <div class="pp-tag-row" id="hashtagRow"></div>
+
+        <div class="pp-section-label">Lift Factors</div>
+        <div id="liftBars"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
